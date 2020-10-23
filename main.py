@@ -5,34 +5,16 @@ lines = 3
 column = 3
 
 
-class Node:
-    heuristic = -1
-    distance = -1
-    state = []
-    predecessor = None
-
-    def __init__(self, p_heuristic, p_distance, p_state, p_pred):
-        self.heuristic = p_heuristic
-        self.distance = p_distance
-        self.state = p_state
-        self.predecessor = p_pred
-
-    def __lt__(self, other):
-        if (self.heuristic + self.distance) != (other.heuristic + other.distance):
-            return (self.heuristic + self.distance) < (other.heuristic + other.distance)
-        else:
-            return self.heuristic < other.heuristic
-
-    def print_state(self):
-        global lines
-        global column
-        for i in range(0, lines):
-            for j in range(0, column):
-                if self.state[i][j] == -1:
-                    print('  _', end='')
-                else:
-                    print('{:3d}'.format(self.state[i][j]), end='')
-            print()
+def print_state(state):
+    global lines
+    global column
+    for i in range(0, lines):
+        for j in range(0, column):
+            if state[i][j] == -1:
+                print('  _', end='')
+            else:
+                print('{:3d}'.format(state[i][j]), end='')
+        print()
 
 
 def num_of_inversions(p_state):
@@ -135,54 +117,55 @@ def swap(x1_l, y1_c, x2_l, y2_c, p_state):
 
 def print_process(node):
     steps = []
-    while node.predecessor != None:
-        steps.insert(0, node)
-        node = node.predecessor
-    steps.insert(0, node)
+    while list(node)[3] != None:
+        steps.insert(0, list(node)[2])
+        node = list(node)[3]
+    steps.insert(0, list(node)[2])
 
     for x in steps:
-        x.print_state()
+        print_state(x)
         print()
 
 
 def find_final(start_pos, final_pos):
     heap = []
-    first = Node(heuristic_1(start_pos, final_pos), 0, start_pos, None)
+    first = (heuristic_2(start_pos, final_pos), 0, start_pos, None)
     created = {}
-    while first.heuristic != 0:
-        x_l, y_c = find_blank(first.state)
-
+    while list(first)[0] - list(first)[1] != 0:
+        x_l, y_c = find_blank(list(first)[2])
+        dist = list(first)[1] + 1
+        f_list = list(first)[2]
         # right shift
         if y_c - 1 >= 0:
-            new = [list(x) for x in first.state]
+            new = [list(x) for x in f_list]
             swap(x_l, y_c - 1, x_l, y_c, new)
             if created.get(hash(str(new))) != new:
                 created[hash(str(new))] = new
-                heapq.heappush(heap, Node(heuristic_2(new, final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, (heuristic_2(new, final_pos) + dist, dist, new, first))
 
         # left shift
         if y_c + 1 < column:
-            new = [list(x) for x in first.state]
+            new = [list(x) for x in f_list]
             swap(x_l, y_c + 1, x_l, y_c, new)
             if created.get(hash(str(new))) != new:
                 created[hash(str(new))] = new
-                heapq.heappush(heap, Node(heuristic_2(new, final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, (heuristic_2(new, final_pos) + dist, dist, new, first))
 
         # up shift
         if x_l + 1 < lines:
-            new = [list(x) for x in first.state]
+            new = [list(x) for x in f_list]
             swap(x_l + 1, y_c, x_l, y_c, new)
             if created.get(hash(str(new))) != new:
                 created[hash(str(new))] = new
-                heapq.heappush(heap, Node(heuristic_2(new, final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, (heuristic_2(new, final_pos) + dist, dist, new, first))
 
         # down shift
         if x_l - 1 >= 0:
-            new = [list(x) for x in first.state]
+            new = [list(x) for x in f_list]
             swap(x_l - 1, y_c, x_l, y_c, new)
             if created.get(hash(str(new))) != new:
                 created[hash(str(new))] = new
-                heapq.heappush(heap, Node(heuristic_2(new, final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, (heuristic_2(new, final_pos) + dist, dist, new, first))
 
         first = heapq.heappop(heap)
     return first
@@ -193,10 +176,10 @@ column = int(input("Zadaj počet stĺpcov: "))
 start_pos = load_state_from_console()
 final_pos = load_state_from_console()
 timer = 0.0
-"""
+
 for i in range(0, 100):
     start = time.time()
-    print_process(find_final(start_pos, final_pos))
+    find_final(start_pos, final_pos)
     end = time.time()
     timer += end - start
 print("Cas: ", timer/100)
@@ -209,4 +192,4 @@ if is_possible(start_pos) == is_possible(final_pos):
     end = time.time()
     print("Cas: ", end - start)
 else:
-    print("Nie je mozne")
+    print("Nie je mozne")"""
