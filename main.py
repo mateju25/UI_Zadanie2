@@ -1,6 +1,5 @@
 import heapq
 import os
-import profile
 import time
 
 # vyska a sirka hlavolamu
@@ -227,7 +226,6 @@ def print_process(p_node):
 
 # A* algoritmus - vytvorim si min_heap, kde ukladam vytvorene uzly, vyberiem vzdy najmensi prvok a rozbalim ho do
 # dalsich stavov, vsetky vytvorene stavy pridam do hash tabulky, aby som sa necyklil
-@profile
 def find_final(p_start_pos, p_final_pos):
     heap = []
     first = Node(choose_heuristic(p_start_pos, p_final_pos), 0, p_start_pos, None)
