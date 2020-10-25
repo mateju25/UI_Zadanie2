@@ -1,6 +1,5 @@
 import heapq
 import os
-import profile
 import time
 
 # vyska a sirka hlavolamu
@@ -30,7 +29,6 @@ class Node:
             return self.heuristic < other.heuristic
         else:
             return (self.heuristic + self.distance) < (other.heuristic + other.distance)
-
 
 
 # region funkcie k heuristikam
@@ -78,15 +76,9 @@ def is_possible(p_state):
             return False
 
 
-# vyber typ heuristiky
-def choose_heuristic(p_start_state, p_final_state):
-    global type_heu
-    if type_heu == 1:
-        return heuristic_1(p_start_state, p_final_state)
-    elif type_heu == 2:
-        return heuristic_2(p_start_state, p_final_state)
-    elif type_heu == 3:
-        return heuristic_1(p_start_state, p_final_state) + heuristic_2(p_start_state, p_final_state)
+# heuristika 3 = heuristika 1 + heuristika 2
+def heuristic_3(p_start_state, p_final_state):
+    return heuristic_1(p_start_state, p_final_state) + heuristic_2(p_start_state, p_final_state)
 
 
 # heuristika 1 - pocet policok na nespravnom mieste
@@ -227,10 +219,17 @@ def print_process(p_node):
 
 # A* algoritmus - vytvorim si min_heap, kde ukladam vytvorene uzly, vyberiem vzdy najmensi prvok a rozbalim ho do
 # dalsich stavov, vsetky vytvorene stavy pridam do hash tabulky, aby som sa necyklil
-@profile
 def find_final(p_start_pos, p_final_pos):
+    global type_heu
+    if type_heu == 1:
+        heu = heuristic_1
+    elif type_heu == 2:
+        heu = heuristic_2
+    elif type_heu == 3:
+        heu = heuristic_3
+
     heap = []
-    first = Node(choose_heuristic(p_start_pos, p_final_pos), 0, p_start_pos, None)
+    first = Node(heu(p_start_pos, p_final_pos), 0, p_start_pos, None)
     created = {}
     while first.heuristic != 0:
         x_l, y_c = find_blank(first.state)
@@ -240,7 +239,7 @@ def find_final(p_start_pos, p_final_pos):
             swap(x_l, y_c - 1, x_l, y_c, new)
             if created.get(str(new)) is None:
                 created[str(new)] = 1
-                heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, Node(heu(new, p_final_pos), first.distance + 1, new, first))
 
         # left shift
         if y_c + 1 < column:
@@ -248,7 +247,7 @@ def find_final(p_start_pos, p_final_pos):
             swap(x_l, y_c + 1, x_l, y_c, new)
             if created.get(str(new)) is None:
                 created[str(new)] = 1
-                heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, Node(heu(new, p_final_pos), first.distance + 1, new, first))
 
         # up shift
         if x_l + 1 < lines:
@@ -256,7 +255,7 @@ def find_final(p_start_pos, p_final_pos):
             swap(x_l + 1, y_c, x_l, y_c, new)
             if created.get(str(new)) is None:
                 created[str(new)] = 1
-                heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, Node(heu(new, p_final_pos), first.distance + 1, new, first))
 
         # down shift
         if x_l - 1 >= 0:
@@ -264,7 +263,7 @@ def find_final(p_start_pos, p_final_pos):
             swap(x_l - 1, y_c, x_l, y_c, new)
             if created.get(str(new)) is None:
                 created[str(new)] = 1
-                heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
+                heapq.heappush(heap, Node(heu(new, p_final_pos), first.distance + 1, new, first))
 
         first = heapq.heappop(heap)
     return first
@@ -283,7 +282,7 @@ def print_menu():
     print("*****************************************************************************")
     print()
     go = True
-    file_name = ''
+    file_name = 'heuA=9-Hard.txt'
     file = input("Nacitat zo suboru? y / iné: ")
     if file == 'y':
         file_name = checks_existency()
