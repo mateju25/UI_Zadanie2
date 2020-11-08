@@ -237,7 +237,7 @@ def find_final(p_start_pos, p_final_pos):
             new = [list(x) for x in first.state]
             swap(x_l, y_c - 1, x_l, y_c, new)
             if created.get(str(new)) is None:
-                created[str(new)] = 1
+                created[str(new)] = True
                 heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
 
         # left shift
@@ -245,7 +245,7 @@ def find_final(p_start_pos, p_final_pos):
             new = [list(x) for x in first.state]
             swap(x_l, y_c + 1, x_l, y_c, new)
             if created.get(str(new)) is None:
-                created[str(new)] = 1
+                created[str(new)] = True
                 heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
 
         # up shift
@@ -253,7 +253,7 @@ def find_final(p_start_pos, p_final_pos):
             new = [list(x) for x in first.state]
             swap(x_l + 1, y_c, x_l, y_c, new)
             if created.get(str(new)) is None:
-                created[str(new)] = 1
+                created[str(new)] = True
                 heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
 
         # down shift
@@ -261,7 +261,7 @@ def find_final(p_start_pos, p_final_pos):
             new = [list(x) for x in first.state]
             swap(x_l - 1, y_c, x_l, y_c, new)
             if created.get(str(new)) is None:
-                created[str(new)] = 1
+                created[str(new)] = True
                 heapq.heappush(heap, Node(choose_heuristic(new, p_final_pos), first.distance + 1, new, first))
 
         first = heapq.heappop(heap)
@@ -360,3 +360,4 @@ def print_menu():
 
 
 print_menu()
+input("Ukonči program - enter")
